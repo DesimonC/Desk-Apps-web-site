@@ -7,7 +7,7 @@ exports.handler = async (event) => {
     if ((event.body || '').length > 10000) return {statusCode:413,body:JSON.stringify({ok:false,error:'Message too large'})};
     const data = JSON.parse(event.body || '{}');
     const clean = key => String(data[key] || '').trim();
-    if (data.consent !== true || !clean('name') || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(clean('email')) || !clean('phone') || !clean('device') || !clean('app')) return {statusCode:400,body:JSON.stringify({ok:false,error:'Please complete all required fields'})};
+    if (data.consent !== true || !clean('name') || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean('email')) || !clean('phone') || !clean('device') || !clean('app')) return {statusCode:400,body:JSON.stringify({ok:false,error:'Please complete all required fields'})};
     const payload = {name:clean('name').slice(0,80),email:clean('email').slice(0,160),phone:clean('phone').slice(0,30),device:clean('device').slice(0,80),app:clean('app').slice(0,100),notes:clean('notes').slice(0,1500),consent:true,secret};
     const response = await fetch(endpoint,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),redirect:'follow'});
     const body = await response.text();
