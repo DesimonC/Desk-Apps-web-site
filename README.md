@@ -33,3 +33,10 @@ Tester and feedback forms launch a prefilled `mailto:` message addressed to `Des
 
 ## Publication notes
 Descriptions and development statuses are preliminary and should be reviewed before a public launch. Do not publish internal business forecasts. Add a full privacy notice before enabling database-backed tester registrations or analytics.
+
+## Tester registration backend (Netlify)
+The website submits tester registrations to `/.netlify/functions/register-tester`, which forwards them to the Google Apps Script deployment. Configure these environment variables in Netlify (do not put secrets in GitHub):
+- `TESTER_SCRIPT_URL`: `https://script.google.com/macros/s/AKfycbxK2dr53S8dvD3soXHzeazHp4AvXViYb5DIxqIlhRHejpVuSwlqhUCK7kEUxCfZHS3oKg/exec`
+- `REGISTRATION_SECRET`: the same private value configured in Apps Script Script Properties.
+
+The Apps Script source is in `docs/tester-apps-script.gs`. Deploy its latest version before testing. Tester registrations save to the existing Testers tab; the App field is in column H. Do not consider the registration working until a real end-to-end test succeeds.
