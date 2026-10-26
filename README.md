@@ -23,8 +23,12 @@ Until these PNGs are uploaded, the cards show an emoji fallback instead of a bro
 ## Forms
 Tester registrations submit directly to the Netlify function and save to the private Testers Google spreadsheet. Feedback opens a prepared email for the visitor to send.
 
-Registration requires name, contact email, phone, device type, make/model, OS version, country, app preference and consent. Android and Apple testers also provide their store invitation email. Optional notes are supported. The original eight spreadsheet columns are preserved: Timestamp, Name, Email, Phone number, Device, Notes, Consent, App. Device contains the model; Notes contains device type, model, OS, country, store email, website source, consent wording version and additional notes. Timestamp and consent are saved by the existing Apps Script. Existing records are unchanged. No dependency on the retired testers app.
+Registration requires name, contact email, phone, device type, make/model, OS version, country, app preference and consent. Android and Apple testers also provide their store invitation email. Optional notes are supported.
 
+New registrations go to `Testers2`, with row 1 headings in this exact order:
+Registration timestamp | Name | Email address | Phone number | Device type | Device make and model | Operating system and version | Country | Store invitation email | App to test | Additional notes | Consent
+
+The original Testers tab and its records remain untouched. The Netlify function sends structured fields plus legacy fields during rollout. The new Apps Script accepts either payload and saves the twelve separate columns to Testers2.
 ## Smoke test checklist
 1. Open on phone and desktop, check navigation and mobile menu.
 2. Open and close every app detail modal, including keyboard Escape.
@@ -41,7 +45,15 @@ The website submits tester registrations to `/.netlify/functions/register-tester
 - `TESTER_SCRIPT_URL`: `https://script.google.com/macros/s/AKfycbxK2dr53S8dvD3soXHzeazHp4AvXViYb5DIxqIlhRHejpVuSwlqhUCK7kEUxCfZHS3oKg/exec`
 - `REGISTRATION_SECRET`: the same private value configured in Apps Script Script Properties.
 
-The Apps Script source is in `docs/tester-apps-script.gs`. Deploy its latest version before testing. Tester registrations save to the existing Testers tab; the App field is in column H. Do not consider the registration working until a real end-to-end test succeeds.
+The Apps Script source is in `docs/tester-apps-script.gs`. Deploy its latest version before testing. Tester registrations save to Testers2; the App field is in column J. Do not consider the registration working until a real end-to-end test succeeds.
 
 ## Registration checks
-Run `node --test tests/register-tester.test.js`. These checks use a mocked Apps Script sheet and service; they do not add synthetic people to the live spreadsheet. After deployment, confirm a genuine registration appears in Testers before treating the live connection as verified.
+Run `node --test tests/register-tester.test.js`. These checks use a mocked Apps Script sheet and service; they do not add synthetic people to the live spreadsheet. After deployment, confirm a genuine registration appears in Testers2 before treating the live connection as verified.
+
+
+## Activate the Testers2 script
+1. Open the Testers spreadsheet, then Extensions → Apps Script.
+2. Replace the registration Code.gs contents with `docs/tester-apps-script.gs` and save. Keep the existing REGISTRATION_SECRET Script Property unchanged.
+3. Select Deploy → Manage deployments → Edit (pencil) on the existing web-app deployment → Version: New version → Deploy. Keep its existing execution and access settings.
+4. Updating the existing deployment preserves its /exec URL. Netlify TESTER_SCRIPT_URL must match that deployment's URL; the value above may be an earlier deployment.
+5. Submit the website form and confirm the row appears under the twelve headings in Testers2. Do not test by pressing Run on doPost; the editor supplies no form event.
