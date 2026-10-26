@@ -17,7 +17,9 @@ exports.handler = async (event) => {
   }
   const needsStore = clean.device.startsWith('Android') || ['iPhone','iPad','Mac'].includes(clean.device);
   if (data.consent !== true || !['name','email','phone','device','deviceModel','osVersion','country','app'].every(key=>clean[key]) || !devices.includes(clean.device) || !emailPattern.test(clean.email) || (needsStore && !emailPattern.test(clean.storeEmail))) return reply(400, {ok:false,error:'Please complete all required fields, including your store invitation email where shown'});
-  const endpoint = process.env.TESTER_SCRIPT_URL;
+  // Public deployment URL for the Testers2 registration script.
+  // The shared secret remains in Netlify environment variables.
+  const endpoint = 'https://script.google.com/macros/s/AKfycbzWFM1IGW0BEw7D5QWpGzU89KyO_mYFx8H1jMapzzM8sCwMSIFqBs1FnPLpBIC2zpYwBw/exec';
   const secret = process.env.REGISTRATION_SECRET;
   if (!endpoint || !secret) return reply(503, {ok:false,error:'Registration is not configured yet'});
   // Keep the legacy fields during rollout so the previous Apps Script still
