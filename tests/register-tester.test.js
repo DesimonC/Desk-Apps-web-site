@@ -4,7 +4,9 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const {handler} = require('../netlify/functions/register-tester');
 const valid = {name:'Test Person',email:'contact@example.test',phone:'07123456789',device:'Android phone',deviceModel:'Samsung Galaxy A54',osVersion:'Android 14',country:'United Kingdom',storeEmail:'play@example.test',app:'Poker Compass',notes:'Available evenings',consent:true};
-process.env.TESTER_SCRIPT_URL='https://example.test/registration';
+const registrationEndpoint='https://script.google.com/macros/s/AKfycbzWFM1IGW0BEw7D5QWpGzU89KyO_mYFx8H1jMapzzM8sCwMSIFqBs1FnPLpBIC2zpYwBw/exec';
+// A stale setting from an earlier deployment must not redirect registrations.
+process.env.TESTER_SCRIPT_URL='https://example.test/retired-registration';
 process.env.REGISTRATION_SECRET='test-only-secret';
 const submit = data => handler({httpMethod:'POST',body:JSON.stringify(data)});
 
@@ -12,7 +14,7 @@ test('registration saves every field in the matching Testers2 column', async()=>
   const rows=[];
   const context={LockService:{getScriptLock:()=>({waitLock(){},hasLock:()=>true,releaseLock(){}})},PropertiesService:{getScriptProperties:()=>({getProperty:()=>process.env.REGISTRATION_SECRET})},SpreadsheetApp:{flush(){},getActiveSpreadsheet:()=>({getSheetByName:name=>{assert.equal(name,'Testers2');return {getRange:()=>({getValues:()=>[Array.from(context.TESTER_HEADERS)]}),appendRow:row=>rows.push(row)}}})},ContentService:{MimeType:{JSON:'json'},createTextOutput:text=>({text,setMimeType(){return this}})},console};
   vm.createContext(context);vm.runInContext(fs.readFileSync(require.resolve('../docs/tester-apps-script.gs'),'utf8'),context);
-  global.fetch=async(url,options)=>{assert.equal(url,process.env.TESTER_SCRIPT_URL);const saved=context.doPost({postData:{contents:options.body}});return {ok:true,json:async()=>JSON.parse(saved.text)}};
+  global.fetch=async(url,options)=>{assert.equal(url,registrationEndpoint);const saved=context.doPost({postData:{contents:options.body}});return {ok:true,json:async()=>JSON.parse(saved.text)}};
   assert.equal((await submit(valid)).statusCode,200);
   assert.equal(rows.length,1);assert.equal(rows[0].length,12);
   assert.deepEqual(Array.from(rows[0]).slice(1),[valid.name,valid.email,valid.phone,valid.device,valid.deviceModel,valid.osVersion,valid.country,valid.storeEmail,valid.app,valid.notes,'Yes']);
