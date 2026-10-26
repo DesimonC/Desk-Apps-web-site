@@ -20,8 +20,8 @@ exports.handler = async (event) => {
   const endpoint = process.env.TESTER_SCRIPT_URL;
   const secret = process.env.REGISTRATION_SECRET;
   if (!endpoint || !secret) return reply(503, {ok:false,error:'Registration is not configured yet'});
-  // Preserve the existing eight-column Apps Script contract. All added details
-  // are included in Notes so the current deployed script saves them immediately.
+  // Keep the legacy fields during rollout so the previous Apps Script still
+  // accepts registrations until its new version is deployed.
   const notes = [
     'Source: DesK Apps website',
     `Device type: ${clean.device}`,
@@ -35,7 +35,7 @@ exports.handler = async (event) => {
   // The existing Apps Script limits Notes to 1500 characters; reject instead of
   // silently losing the end of a tester's notes.
   if (notes.length > 1500) return reply(400, {ok:false,error:'Please shorten your additional notes so all registration details can be saved'});
-  const payload = {name:clean.name,email:clean.email,phone:clean.phone,device:clean.deviceModel,app:clean.app,notes,consent:true,secret};
+  const payload = {name:clean.name,email:clean.email,phone:clean.phone,device:clean.deviceModel,app:clean.app,notes,consent:true,secret,registrationVersion:3,deviceType:clean.device,deviceModel:clean.deviceModel,osVersion:clean.osVersion,country:clean.country,storeEmail:needsStore ? clean.storeEmail : '',additionalNotes:clean.notes};
   try {
     const response = await fetch(endpoint,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),redirect:'follow',signal:AbortSignal.timeout(20000)});
     const result = await response.json();
@@ -47,3 +47,4 @@ exports.handler = async (event) => {
     return reply(502, {ok:false,error:'Registration service unavailable. Please try later.'});
   }
 };
+
