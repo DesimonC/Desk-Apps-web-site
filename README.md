@@ -41,8 +41,8 @@ The original Testers tab and its records remain untouched. The Netlify function 
 Descriptions and development statuses are preliminary and should be reviewed before a public launch. Do not publish internal business forecasts. Keep the privacy notice aligned with registration storage and any future analytics.
 
 ## Tester registration backend (Netlify)
-The website submits tester registrations to `/.netlify/functions/register-tester`, which forwards them to the Google Apps Script deployment. Configure these environment variables in Netlify (do not put secrets in GitHub):
-- `TESTER_SCRIPT_URL`: `https://script.google.com/macros/s/AKfycbxK2dr53S8dvD3soXHzeazHp4AvXViYb5DIxqIlhRHejpVuSwlqhUCK7kEUxCfZHS3oKg/exec`
+The website submits tester registrations to `/.netlify/functions/register-tester`, which forwards them to the Google Apps Script deployment. The current public deployment URL is pinned in `netlify/functions/register-tester.js`. Configure the secret in Netlify (do not put secrets in GitHub):
+- Current Apps Script deployment: `https://script.google.com/macros/s/AKfycbzWFM1IGW0BEw7D5QWpGzU89KyO_mYFx8H1jMapzzM8sCwMSIFqBs1FnPLpBIC2zpYwBw/exec`. The previous `TESTER_SCRIPT_URL` environment variable is no longer used.
 - `REGISTRATION_SECRET`: the same private value configured in Apps Script Script Properties.
 
 The Apps Script source is in `docs/tester-apps-script.gs`. Deploy its latest version before testing. Tester registrations save to Testers2; the App field is in column J. Do not consider the registration working until a real end-to-end test succeeds.
@@ -55,5 +55,5 @@ Run `node --test tests/register-tester.test.js`. These checks use a mocked Apps 
 1. Open the Testers spreadsheet, then Extensions → Apps Script.
 2. Replace the registration Code.gs contents with `docs/tester-apps-script.gs` and save. Keep the existing REGISTRATION_SECRET Script Property unchanged.
 3. Select Deploy → Manage deployments → Edit (pencil) on the existing web-app deployment → Version: New version → Deploy. Keep its existing execution and access settings.
-4. Updating the existing deployment preserves its /exec URL. Netlify TESTER_SCRIPT_URL must match that deployment's URL; the value above may be an earlier deployment.
+4. Updating the existing deployment preserves its /exec URL. If creating a different deployment, update the public endpoint in `netlify/functions/register-tester.js` and its test fixture to match.
 5. Submit the website form and confirm the row appears under the twelve headings in Testers2. Do not test by pressing Run on doPost; the editor supplies no form event.
