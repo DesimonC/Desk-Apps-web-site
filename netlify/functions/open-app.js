@@ -1,5 +1,10 @@
 // Only these confirmed public app addresses may be checked or returned.
 const sites = Object.freeze({
+  'find-it': 'find-it2',
+  'chore-n-score': 'chore-n-score',
+  'card-games': 'deskapps-cardgames',
+  'card-magic-academy': 'card-magic-academy',
+  birdsong: 'desk-apps-birdsong',
   'plate-a-mate': 'plate-a-mate',
   'spice-of-life': 'spice-o-life',
   'poker-compass': 'pokercompass',
