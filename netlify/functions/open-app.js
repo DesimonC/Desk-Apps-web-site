@@ -13,11 +13,12 @@ const sites = Object.freeze({
   'spacestation-v3': 'spacestation-v3',
   'christmas-in-aisle-7': 'christmas-in-aisle-7'
 });
+const readyApps = new Set(['find-it','plate-a-mate','spice-of-life','spacestation-v3','christmas-in-aisle-7']);
 const reply = (statusCode, data) => ({statusCode, headers: {'Content-Type': 'application/json', 'Cache-Control': 'no-store'}, body: JSON.stringify(data)});
 exports.handler = async event => {
   if (event.httpMethod !== 'GET') return reply(405, {available:false});
   const id = event.queryStringParameters?.app;
-  if (!Object.hasOwn(sites, id)) return reply(404, {available:false});
+  if (!readyApps.has(id) || !Object.hasOwn(sites, id)) return reply(404, {available:false});
   const url = 'https://' + sites[id] + '.netlify.app/';
   try {
     // Do not follow redirects to unverified hosts or mistake a login page for an app.
