@@ -115,7 +115,7 @@ document.getElementById('bespokeForm')?.addEventListener('submit',function(event
  event.preventDefault();
  const v=id=>document.getElementById(id).value.trim();
  const body='Name: '+v('bespokeName')+'\nEmail: '+v('bespokeEmail')+'\nFor: '+v('bespokeType')+'\nPlatform: '+v('bespokePlatform')+'\n\nApp idea:\n'+v('bespokeIdea');
- const destination='mailto:deskappsuk@gmail.com?subject='+encodeURIComponent('Bespoke app enquiry')+'&body='+encodeURIComponent(body);
+ const destination='mailto:DesK.Apps.DK@gmail.com?subject='+encodeURIComponent('Bespoke app enquiry')+'&body='+encodeURIComponent(body);
  window.location.href=destination;
  document.getElementById('bespokeResult').textContent='Your email app should open with the enquiry ready. Please press Send there to submit it.';
 });
